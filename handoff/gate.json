@@ -1,0 +1,8 @@
+{
+  "task": "做3D模型演示光刻机原理，输出网页",
+  "round1": {
+    "brief": "handoff/briefs/做3D模型演示光刻机原理，输出网页.md",
+    "plan": "handoff/plans/做3D模型演示光刻机原理，输出网页.md",
+    "guardedPaths": ["src/","assets/","scripts/","tests/","index.html"]
+  }
+}
