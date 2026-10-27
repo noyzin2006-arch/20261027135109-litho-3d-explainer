@@ -5,7 +5,7 @@ import * as THREE from "three";
 import { mat, makeLabel, beamTube, beamArrow } from "./env.js";
 import { L_POLYGON } from "../logic/pattern.js";
 
-const BAY = { x0: -1.85, x1: 0.75, y0: 0.28, y1: 2.35 }; // 前面板开口范围
+const BAY = { x0: -1.9, x1: 0.95, y0: 0.28, y1: 2.4 }; // 前面板开口范围
 
 function box(w, h, d, material, x, y, z, parent) {
   const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
@@ -116,7 +116,7 @@ export function buildMachine() {
   }
   // 前面板：右半保留；左半开口（框架柱保留）
   const frontZ = D / 2;
-  box(1.9, H, 0.08, mat.cabinetWhite(), 1.65, 0.22 + H / 2, frontZ, shell); // 右前板
+  box(1.1, H, 0.08, mat.cabinetWhite(), 1.6, 0.22 + H / 2, frontZ, shell); // 右前板
   // 左半框架柱
   box(0.12, H, 0.12, mat.cabinetPanel(), BAY.x0 - 0.06, 0.22 + H / 2, frontZ, shell);
   box(0.12, H, 0.12, mat.cabinetPanel(), BAY.x1 + 0.06, 0.22 + H / 2, frontZ, shell);
@@ -143,9 +143,14 @@ export function buildMachine() {
   box(0.06, BAY.y1 - BAY.y0, 2.4, mat.darkBay(), BAY.x1 + 0.03, (BAY.y0 + BAY.y1) / 2, -0.35, bay); // 分隔墙
   box(BAY.x1 - BAY.x0, BAY.y1 - BAY.y0, 0.06, mat.darkBay(), (BAY.x0 + BAY.x1) / 2, (BAY.y0 + BAY.y1) / 2, -1.45, bay); // 舱后壁
 
+  // 光学组件整体前移，贴近开口便于观察
+  const inner = new THREE.Group();
+  inner.position.z = 0.78;
+  root.add(inner);
+
   /* ---------- 光源模块（左后） ---------- */
   const source = new THREE.Group();
-  bay.add(source);
+  inner.add(source);
   const srcBody = box(0.85, 0.8, 0.7, mat.steel(), -1.45, 1.95, -0.85, source);
   box(0.2, 0.2, 0.2, mat.anodized(), -1.45, 2.42, -0.85, source); // 顶部谐振腔
   // 散热鳍
@@ -155,14 +160,14 @@ export function buildMachine() {
 
   /* ---------- 照明系统（顶腔） ---------- */
   const illuminator = new THREE.Group();
-  bay.add(illuminator);
+  inner.add(illuminator);
   const illumBody = box(1.1, 0.42, 0.8, mat.cabinetPanel(), -0.62, 2.12, -0.45, illuminator);
   // 出光口
   box(0.18, 0.06, 0.18, mat.darkSteel(), -0.1, 1.93, -0.45, illuminator);
 
   /* ---------- 掩模台 ---------- */
   const maskStage = new THREE.Group();
-  bay.add(maskStage);
+  inner.add(maskStage);
   box(0.95, 0.1, 0.85, mat.anodized(), 0.32, 1.55, -0.45, maskStage); // 台板
   // 导轨
   box(1.3, 0.04, 0.06, mat.steel(), 0.32, 1.49, -0.78, maskStage);
@@ -174,7 +179,7 @@ export function buildMachine() {
 
   /* ---------- 投影光学柱（斜柱：掩模 → 晶圆台） ---------- */
   const projection = new THREE.Group();
-  bay.add(projection);
+  inner.add(projection);
   const axisFrom = new THREE.Vector3(0.32, 1.42, -0.45);
   const axisTo = new THREE.Vector3(1.42, 0.62, -0.45);
   const axis = axisTo.clone().sub(axisFrom);
@@ -196,7 +201,7 @@ export function buildMachine() {
 
   /* ---------- 晶圆台 ---------- */
   const waferStage = new THREE.Group();
-  bay.add(waferStage);
+  inner.add(waferStage);
   box(0.72, 0.1, 0.72, mat.anodized(), 1.42, 0.5, -0.45, waferStage); // 台板
   box(1.2, 0.05, 0.08, mat.steel(), 1.42, 0.42, -0.7, waferStage); // 导轨
   box(1.2, 0.05, 0.08, mat.steel(), 1.42, 0.42, -0.2, waferStage);
@@ -224,19 +229,19 @@ export function buildMachine() {
     [1.42, 0.58, -0.45], // 晶圆
   ];
   const beam = beamTube(pathPoints, 0.012, beamMat);
-  bay.add(beam);
+  inner.add(beam);
   const arrows = [
     beamArrow([-0.62, 2.12, -0.45], [-0.1, 1.9, -0.45], beamMat),
     beamArrow([0.32, 1.42, -0.45], [1.42, 0.62, -0.45], beamMat),
   ];
-  arrows.forEach((a) => bay.add(a));
+  arrows.forEach((a) => inner.add(a));
 
   /* ---------- 标签 ---------- */
   const labels = new THREE.Group();
-  root.add(labels);
+  inner.add(labels);
   const labelDefs = [
-    ["光源模块", [-1.45, 2.55, -0.85]],
-    ["照明系统", [-0.62, 2.45, -0.45]],
+    ["光源模块", [-1.45, 2.72, -0.85]],
+    ["照明系统", [-0.28, 2.46, -0.45]],
     ["掩模台", [0.32, 1.85, -0.45]],
     ["投影光学", [0.95, 1.15, -0.45]],
     ["晶圆台", [1.42, 0.82, -0.45]],

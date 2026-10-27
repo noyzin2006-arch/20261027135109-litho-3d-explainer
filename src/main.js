@@ -17,8 +17,20 @@ import { UI } from "./ui/ui.js";
 import { CHAPTERS } from "./logic/chapters-data.js";
 
 function boot() {
-  const host = document.getElementById("canvas-host");
+  window.addEventListener("error", (e) => {
+    let bar = document.getElementById("err-bar");
+    if (!bar) {
+      bar = document.createElement("div");
+      bar.id = "err-bar";
+      bar.style.cssText =
+        "position:fixed;left:8px;top:44px;z-index:9999;background:#a52a21;color:#fff;font:12px/1.5 monospace;padding:6px 10px;border-radius:6px;max-width:80vw;max-height:40vh;overflow:auto";
+      document.body.appendChild(bar);
+    }
+    bar.textContent = "ERR: " + (e.error && e.stack ? e.stack.split("\n").slice(0, 3).join(" | ") : e.message);
+    console.error("[litho]", e.error || e.message);
+  });
   document.getElementById("root").innerHTML = UI.skeleton();
+  const host = document.getElementById("canvas-host");
   const ui = new UI({
     onChapter: (i) => director.goTo(i),
     onAction: (action, on, btn) => action.run(ctx, on, btn),
@@ -151,29 +163,51 @@ function boot() {
 
   // 主循环
   const clock = new THREE.Clock();
-  function loop() {
-    requestAnimationFrame(loop);
+  function step() {
     const dt = Math.min(clock.getDelta(), 0.05);
     const time = clock.elapsedTime;
-    tweens.tick(dt);
+    tweens.tick();
     if (!REDUCED_MOTION) controls.update();
     director.tick(dt, time);
     renderer.render(scene, camera);
+  }
+  let lastFrame = performance.now();
+  function loop() {
+    lastFrame = performance.now();
+    requestAnimationFrame(loop);
+    step();
+  }
+  // 兜底：标签页被遮挡时 rAF 会被 Chrome 暂停，页面定时器也被重度节流；
+  // Worker 内的定时器不受此限制，用它维持遮挡态下场景状态正确（切回即正确）。
+  try {
+    const workerSrc = "setInterval(()=>postMessage(0),200);";
+    const worker = new Worker(URL.createObjectURL(new Blob([workerSrc], { type: "text/javascript" })));
+    worker.onmessage = () => {
+      if (performance.now() - lastFrame > 150) {
+        lastFrame = performance.now();
+        step();
+      }
+    };
+  } catch (_) {
+    setInterval(() => {
+      if (performance.now() - lastFrame > 250) {
+        lastFrame = performance.now();
+        step();
+      }
+    }, 200);
   }
 
   ui.loaderProgress(1, "开展");
   setTimeout(() => {
     ui.loaderDone();
     loop();
-    // 初始相机停在整机全景（封面背后即可见完整机身）
-    camera.position.set(...[8.2, 3.4, 9.6]);
-    controls.target.set(0.2, 1.25, 0);
+    // 初始相机停在整机全景（封面背后即可见完整机身与内舱开口）
+    camera.position.set(3.2, 2.7, 10.4);
+    controls.target.set(-0.7, 1.35, 0.2);
     controls.update();
     // 若 URL 带章节 hash，直接恢复
     if (!fromHash()) {
-      // 预选第 0 章但保持封面（点“开始探索”后进入）
-      director.index = 0;
-      director.visited.add(CHAPTERS[0].id);
+      // 保持封面：首次进入由“开始探索”触发第 0 章
     }
   }, 350);
 }

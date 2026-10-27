@@ -9,14 +9,14 @@ import { layoutFields } from "../logic/fields.js";
 export const FIELD_LAYOUT = layoutFields({ fieldW: 0.46, fieldH: 0.4 });
 
 const M = { // 整机机位
-  wide: { pos: [8.2, 3.4, 9.6], target: [0.2, 1.25, 0] },
+  wide: { pos: [3.2, 2.7, 10.4], target: [-0.7, 1.35, 0.2] },
   source: { pos: [0.6, 2.9, 1.6], target: [-1.45, 1.95, -0.85] },
   mask: { pos: [2.6, 2.0, 1.9], target: [0.32, 1.55, -0.45] },
   both: { pos: [3.6, 2.1, 2.8], target: [0.85, 1.15, -0.45] },
   column: { pos: [0.2, 1.35, 1.7], target: [0.9, 1.05, -0.45] },
   waferClose: { pos: [2.2, 1.6, 1.3], target: [1.42, 0.62, -0.45] },
   waferTop: { pos: [1.42, 2.6, 0.9], target: [1.42, 0.6, -0.45] },
-  scanView: { pos: [3.4, 2.4, 2.6], target: [0.8, 1.05, -0.45] },
+  scanView: { pos: [2.8, 2.5, 7.2], target: [0.55, 1.05, -0.2] },
 };
 const U = { // 微观舞台机位（z=60）
   top: { pos: [-3.4, 3.2, 63.6], target: [0, 0.4, 60] },

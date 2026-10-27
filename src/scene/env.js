@@ -76,13 +76,13 @@ class Tween {
     this.ease = ease;
     this.onUpdate = onUpdate;
     this.onDone = onDone;
-    this.t = 0;
+    this.start = performance.now(); // 墙钟时间：标签页被节流也能按时到达
     this.dead = false;
   }
-  tick(dt) {
+  tick() {
     if (this.dead) return true;
-    this.t += dt;
-    const k = this.duration <= 0 ? 1 : Math.min(1, this.t / this.duration);
+    const elapsed = (performance.now() - this.start) / 1000;
+    const k = this.duration <= 0 ? 1 : Math.min(1, elapsed / this.duration);
     this.onUpdate(easings[this.ease](k), k);
     if (k >= 1) {
       this.dead = true;
@@ -105,8 +105,9 @@ export class TweenManager {
     this.list.push(tw);
     return tw;
   }
-  tick(dt) {
-    this.list = this.list.filter((tw) => tw.tick(dt));
+  tick() {
+    // tick() 返回 true = 已完成需移除；返回 false = 进行中需保留
+    this.list = this.list.filter((tw) => !tw.tick());
   }
   cancelAll() {
     for (const tw of this.list) tw.cancel();
@@ -128,7 +129,7 @@ export function flyCamera(camera, controls, tweens, { pos, target, duration = 1.
       camera.position.lerpVectors(p0, p1, k);
       controls.target.lerpVectors(t0, t1, k);
     },
-    onDone,
+    onDone: onArrive,
   });
   // 用户一上手就打断
   const stop = () => tw.cancel();

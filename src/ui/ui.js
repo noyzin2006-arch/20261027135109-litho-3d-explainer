@@ -121,6 +121,8 @@ export class UI {
       scaleEl.style.display = "none";
     }
     $("#copy-card").classList.remove("collapsed");
+    $("#copy-card").classList.remove("hidden");
+    $("#action-bar").classList.remove("hidden");
 
     // 动作条
     const bar = $("#action-bar");
@@ -150,26 +152,32 @@ export class UI {
       bar.appendChild(btn);
       this.actionButtons[a.id] = btn;
     }
-    // 辅图（场图 / 瑞利面板）
+    // 辅图（场图 / 瑞利面板）——靠右放置，避开左下文案卡
+    let hasAux = false;
     if (opts.fieldmap) {
       const holder = document.createElement("div");
+      holder.className = "aux-right";
       bar.appendChild(holder);
       this.fieldmap = createFieldmap(holder);
       this.fieldmap.update(0);
+      hasAux = true;
     } else {
       this.fieldmap = null;
     }
     if (opts.rayleigh) {
       const holder = document.createElement("div");
-      holder.style.flex = "1";
+      holder.className = "aux-right";
       bar.appendChild(holder);
       this.rayleigh = createRayleighPanel(holder);
+      hasAux = true;
     } else {
       this.rayleigh = null;
     }
-    const spacer = document.createElement("div");
-    spacer.className = "spacer";
-    bar.appendChild(spacer);
+    if (!hasAux) {
+      const spacer = document.createElement("div");
+      spacer.className = "spacer";
+      bar.appendChild(spacer);
+    }
   }
 
   wrapBtn(btn) {
@@ -223,7 +231,7 @@ export class UI {
     t.textContent = msg;
     t.classList.add("show");
     clearTimeout(this.toastTimer);
-    this.toastTimer = setTimeout(() => t.classList.remove("show"), 2400);
+    this.toastTimer = setTimeout(() => t.classList.remove("show"), 9000);
   }
 
   showDragHint(msg) {
@@ -298,7 +306,7 @@ export class UI {
             ${ICONS.recenter}<span>本章视角</span>
           </button>
           <div class="drag-hint" id="drag-hint" role="status"></div>
-          <section class="copy-card" id="copy-card" aria-live="polite">
+          <section class="copy-card hidden" id="copy-card" aria-live="polite">
             <div class="chap-no num" id="copy-no"></div>
             <h2 id="copy-title"></h2>
             <p class="what" id="copy-what"></p>
@@ -309,21 +317,21 @@ export class UI {
               展开 / 收起 ${ICONS.chevron}
             </button>
           </section>
-          <div class="action-bar" id="action-bar"></div>
+          <div class="action-bar hidden" id="action-bar"></div>
           <div class="toast" id="toast" role="status"></div>
-        </main>
-      </div>
-      <div class="cover" id="cover">
-        <div class="cover-copy">
-          <h1>把光，印成电路。</h1>
-          <p class="cover-sub">深入一台光刻机，看电路图案如何一层层落在硅片上。</p>
-          <div class="cover-actions">
-            <button class="btn primary" id="cover-start">开始探索</button>
-            <button class="btn" id="cover-free">自由观察</button>
+          <div class="cover" id="cover">
+            <div class="cover-copy">
+              <h1>把光，印成电路。</h1>
+              <p class="cover-sub">深入一台光刻机，看电路图案如何一层层落在硅片上。</p>
+              <div class="cover-actions">
+                <button class="btn primary" id="cover-start">开始探索</button>
+                <button class="btn" id="cover-free">自由观察</button>
+              </div>
+              <p class="cover-note">原理级示意｜比例局部放大｜光束颜色用于讲解</p>
+            </div>
+            <div class="cover-right"></div>
           </div>
-          <p class="cover-note">原理级示意｜比例局部放大｜光束颜色用于讲解</p>
-        </div>
-        <div class="cover-right"></div>
+        </main>
       </div>
       <div class="loader" id="loader">
         <div class="loader-box">
