@@ -1,0 +1,127 @@
+/* ============================================================
+   设计令牌（唯一真源）— TASK-001 光刻机 3D 讲解
+   所有组件只引用令牌，不写字面量（本文件除外）。
+   ============================================================ */
+
+:root {
+  /* ---- 色彩：展厅浅色系 ---- */
+  /* 背景三层 */
+  --bg-0: #f3f4f6;            /* 页面底 */
+  --bg-1: #ffffff;            /* 面板 */
+  --bg-2: #e8ebef;            /* 次级面板 / 分区 */
+  --bg-3: #dfe3e9;            /* 更深分区 */
+  /* 文字四档 */
+  --ink-0: #1b2430;           /* 主文字（对 --bg-1 对比 15.2:1） */
+  --ink-1: #46525f;           /* 次文字 ≥ 7:1 */
+  --ink-2: #5f6b78;           /* 辅助文字 ≥ 4.9:1 */
+  --ink-3: #8a94a0;           /* 仅限大字/禁用（≥3:1 或降级可辨） */
+  /* 边框两层 */
+  --line-0: #d6dbe2;
+  --line-1: #bcc4cd;
+  /* 强调（青蓝=当前观察对象/定位，主操作色） */
+  --accent: #155d9c;          /* 对 --bg-1 对比 6.8:1 */
+  --accent-strong: #0f4778;
+  --accent-soft: #e3eef8;
+  /* 语义色（对应 3D 光路的语义：金=光路，玫红=胶层变化，紫=EUV） */
+  --c-gold: #9a6d07;          /* 光路/能量（文字可读档） */
+  --c-gold-bright: #d9a419;   /* 3D 光束专用 */
+  --c-rose: #a84e64;          /* 胶层化学变化 */
+  --c-rose-soft: #f4e4e9;
+  --c-violet: #63549e;        /* EUV 伪彩 */
+  --c-violet-soft: #e9e5f4;
+  --c-teal: #0c6e78;          /* 观察标记/已曝光场 */
+  --c-teal-soft: #e0f0f1;
+  /* 反馈语义 */
+  --ok: #256c2f;
+  --err: #a52a21;
+  --warn: #8a5a06;
+  /* 焦点/悬停/选中 区分 */
+  --focus-ring: #0b5cad;
+  --hover-tint: #eef2f6;
+
+  /* ---- 字体 ---- */
+  --font-sans: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC",
+    "Source Han Sans SC", "Microsoft YaHei", "Helvetica Neue", Arial,
+    sans-serif;
+  --font-num: ui-monospace, "SF Mono", "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+
+  /* ---- 字阶（比例 1.25，7 级） ---- */
+  --fs-1: 12px;   /* 注脚/来源 */
+  --fs-2: 15px;   /* 正文 */
+  --fs-3: 19px;   /* 小标题 */
+  --fs-4: 24px;   /* 章节标题 */
+  --fs-5: 30px;   /* 首屏副题 */
+  --fs-6: 38px;   /* 首屏标题 */
+  --fs-7: 48px;   /* 展示级 */
+
+  --lh-body: 1.65;
+  --lh-head: 1.25;
+  --lh-tight: 1.2;
+
+  /* ---- 间距（4px 基准梯度） ---- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-7: 48px;
+  --sp-8: 64px;
+  --sp-9: 96px;
+
+  /* ---- 圆角 ---- */
+  --r-1: 4px;
+  --r-2: 8px;
+  --r-3: 12px;
+  --r-4: 16px;
+  --r-pill: 999px;
+
+  /* ---- 阴影（5 档） ---- */
+  --sh-0: none;
+  --sh-1: 0 1px 2px rgba(27, 36, 48, 0.08);
+  --sh-2: 0 2px 8px rgba(27, 36, 48, 0.1);
+  --sh-3: 0 8px 24px rgba(27, 36, 48, 0.14);
+  --sh-4: 0 16px 48px rgba(27, 36, 48, 0.2);
+
+  /* ---- z-index 表 ---- */
+  --z-canvas: 1;
+  --z-overlay: 10;
+  --z-panel: 20;
+  --z-nav: 30;
+  --z-toast: 40;
+  --z-modal: 50;
+
+  /* ---- 布局 ---- */
+  --rail-w: 248px;
+  --measure: 38em;           /* 中文行长 ≤ 40 字 */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ---------- 深色模式（独立色板，非反转） ---------- */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-0: #14181d;
+    --bg-1: #1c2128;
+    --bg-2: #232a32;
+    --bg-3: #2b333d;
+    --ink-0: #eef1f4;
+    --ink-1: #c2cad3;
+    --ink-2: #9aa5b1;
+    --ink-3: #6f7a86;
+    --line-0: #39424d;
+    --line-1: #4a545f;
+    --accent: #6db2e8;
+    --accent-strong: #8fc5f0;
+    --accent-soft: #1d3140;
+    --c-gold: #d9a94b;
+    --c-rose: #d98ba0;
+    --c-violet: #a99ade;
+    --c-teal: #5ec2cc;
+    --ok: #7cc98a;
+    --err: #e3938b;
+    --warn: #d9b26a;
+    --focus-ring: #7db8ea;
+    --hover-tint: #262e37;
+  }
+}

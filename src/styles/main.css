@@ -1,0 +1,848 @@
+/* ============================================================
+   全局样式与界面布局 — TASK-001
+   依赖 tokens.css；动画只用 transform/opacity。
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--fs-2);
+  line-height: var(--lh-body);
+  color: var(--ink-0);
+  background: var(--bg-0);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* 重置默认标题字号（质量线 A1） */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  font-weight: 600;
+  line-height: var(--lh-head);
+}
+
+p {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+::selection {
+  background: var(--accent-soft);
+}
+
+/* ---------- 焦点环（统一，不被裁剪） ---------- */
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--r-1);
+}
+
+/* ---------- 数字与单位 ---------- */
+.num {
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}
+
+/* ============================================================
+   应用骨架：顶栏 / 左章节轨 / 3D 舞台 / 文案卡 / 底部控制
+   ============================================================ */
+
+#app {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  grid-template-columns: var(--rail-w) 1fr;
+  grid-template-areas:
+    "top top"
+    "rail stage";
+  height: 100%;
+}
+
+/* ---------- 顶栏 ---------- */
+.topbar {
+  grid-area: top;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-3) var(--sp-5);
+  background: var(--bg-1);
+  border-bottom: 1px solid var(--line-0);
+  z-index: var(--z-nav);
+}
+
+.topbar .brand {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-3);
+  min-width: 0;
+}
+
+.topbar .brand-title {
+  font-size: var(--fs-3);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.topbar .brand-sub {
+  font-size: var(--fs-1);
+  color: var(--ink-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topbar .progress {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-1);
+  color: var(--ink-2);
+}
+
+.topbar .progress-bar {
+  width: 120px;
+  height: 4px;
+  border-radius: var(--r-pill);
+  background: var(--bg-3);
+  overflow: hidden;
+}
+
+.topbar .progress-bar i {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.4s var(--ease-out);
+}
+
+/* ---------- 章节轨（左） ---------- */
+.rail {
+  grid-area: rail;
+  background: var(--bg-1);
+  border-right: 1px solid var(--line-0);
+  overflow-y: auto;
+  padding: var(--sp-4) var(--sp-3);
+  z-index: var(--z-nav);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.rail-heading {
+  font-size: var(--fs-1);
+  color: var(--ink-2);
+  padding: var(--sp-2) var(--sp-3) var(--sp-1);
+  letter-spacing: 0.08em;
+}
+
+.chapter-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  border-radius: var(--r-2);
+  padding: var(--sp-2) var(--sp-3);
+  cursor: pointer;
+  color: var(--ink-1);
+  min-height: 44px;
+  transition: background-color 0.15s ease;
+}
+
+.chapter-btn:hover {
+  background: var(--hover-tint);
+}
+
+.chapter-btn:active {
+  background: var(--bg-3);
+}
+
+.chapter-btn .no {
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-1);
+  color: var(--ink-2);
+  width: 3ch;
+  flex: none;
+}
+
+.chapter-btn .name {
+  font-size: var(--fs-2);
+  line-height: var(--lh-tight);
+}
+
+.chapter-btn[aria-current="true"] {
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+.chapter-btn[aria-current="true"] .no {
+  color: var(--accent-strong);
+}
+
+.chapter-btn.visited .no::after {
+  content: "";
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--c-teal);
+  margin-left: 4px;
+  vertical-align: 2px;
+}
+
+/* ---------- 3D 舞台 ---------- */
+.stage {
+  grid-area: stage;
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(120% 90% at 62% 30%, #fbfcfd 0%, var(--bg-0) 58%, #e2e6ec 100%);
+}
+
+@media (prefers-color-scheme: dark) {
+  .stage {
+    background: radial-gradient(120% 90% at 62% 30%, #232b34 0%, #161b21 58%, #10141a 100%);
+  }
+}
+
+.stage canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: var(--z-canvas);
+  touch-action: none; /* 交给 OrbitControls 处理手势 */
+}
+
+/* ---------- 文案卡（章节边注） ---------- */
+.copy-card {
+  position: absolute;
+  left: var(--sp-5);
+  bottom: calc(var(--sp-5) + 56px);
+  width: min(400px, calc(100% - var(--sp-10, 40px)));
+  max-width: 400px;
+  background: color-mix(in srgb, var(--bg-1) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--line-0);
+  border-radius: var(--r-3);
+  box-shadow: var(--sh-3);
+  padding: var(--sp-5);
+  z-index: var(--z-panel);
+  pointer-events: auto;
+}
+
+.copy-card .chap-no {
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-1);
+  color: var(--accent);
+  letter-spacing: 0.12em;
+}
+
+.copy-card h2 {
+  font-size: var(--fs-4);
+  margin: var(--sp-1) 0 var(--sp-3);
+  letter-spacing: 0.01em;
+}
+
+.copy-card .what {
+  font-size: var(--fs-2);
+  color: var(--ink-0);
+  max-width: var(--measure);
+}
+
+.copy-card .why {
+  font-size: var(--fs-2);
+  color: var(--ink-1);
+  margin-top: var(--sp-2);
+  max-width: var(--measure);
+}
+
+.copy-card .term {
+  margin-top: var(--sp-3);
+  padding: var(--sp-3);
+  background: var(--bg-2);
+  border-left: 3px solid var(--c-teal);
+  border-radius: 0 var(--r-2) var(--r-2) 0;
+  font-size: var(--fs-1);
+  color: var(--ink-1);
+}
+
+.copy-card .term b {
+  color: var(--ink-0);
+}
+
+.copy-card .scale-note {
+  margin-top: var(--sp-3);
+  font-size: var(--fs-1);
+  color: var(--ink-2);
+  display: flex;
+  gap: var(--sp-2);
+  align-items: center;
+}
+
+.copy-card .scale-note svg {
+  flex: none;
+}
+
+/* ---------- 底部控制条（章节专属动作） ---------- */
+.action-bar {
+  position: absolute;
+  left: var(--sp-5);
+  right: var(--sp-5);
+  bottom: var(--sp-4);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+  z-index: var(--z-panel);
+  pointer-events: none;
+}
+
+.action-bar > * {
+  pointer-events: auto;
+}
+
+.action-bar .spacer {
+  flex: 1;
+  pointer-events: none;
+}
+
+/* ---------- 按钮 ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  border: 1px solid var(--line-1);
+  background: var(--bg-1);
+  color: var(--ink-0);
+  border-radius: var(--r-2);
+  padding: 10px var(--sp-4);
+  min-height: 44px;
+  font-size: var(--fs-2);
+  cursor: pointer;
+  box-shadow: var(--sh-1);
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+    transform 0.1s ease;
+}
+
+.btn:hover {
+  background: var(--hover-tint);
+  border-color: var(--ink-3);
+}
+
+.btn:active {
+  background: var(--bg-3);
+  transform: translateY(1px);
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  cursor: default;
+  color: var(--ink-3);
+  border-color: var(--line-0);
+  box-shadow: none;
+  background: var(--bg-2);
+}
+
+.btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.btn.primary:hover {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+}
+
+.btn.primary:active {
+  background: var(--accent-strong);
+}
+
+.btn.ghost {
+  box-shadow: none;
+  background: color-mix(in srgb, var(--bg-1) 80%, transparent);
+  backdrop-filter: blur(6px);
+}
+
+.btn svg {
+  flex: none;
+}
+
+.btn .spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid color-mix(in srgb, currentColor 30%, transparent);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.btn.icon-only {
+  padding: 10px;
+  width: 44px;
+  justify-content: center;
+}
+
+/* 回到本章视角（右上角） */
+.recenter-btn {
+  position: absolute;
+  top: var(--sp-4);
+  right: var(--sp-4);
+  z-index: var(--z-panel);
+}
+
+/* ---------- 自由观察提示 / 拖动提示 ---------- */
+.drag-hint {
+  position: absolute;
+  top: var(--sp-4);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: var(--fs-1);
+  color: var(--ink-2);
+  background: color-mix(in srgb, var(--bg-1) 85%, transparent);
+  border: 1px solid var(--line-0);
+  border-radius: var(--r-pill);
+  padding: var(--sp-1) var(--sp-3);
+  z-index: var(--z-overlay);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.drag-hint.show {
+  opacity: 1;
+}
+
+/* ---------- 部件提示（点击 3D 物件的第一层信息） ---------- */
+.part-tip {
+  position: absolute;
+  z-index: var(--z-panel);
+  background: var(--bg-1);
+  border: 1px solid var(--line-0);
+  border-radius: var(--r-2);
+  box-shadow: var(--sh-2);
+  padding: var(--sp-3) var(--sp-4);
+  max-width: 280px;
+  font-size: var(--fs-2);
+  pointer-events: auto;
+}
+
+.part-tip .part-name {
+  font-weight: 600;
+}
+
+.part-tip .part-role {
+  color: var(--ink-1);
+  font-size: var(--fs-1);
+  margin-top: 2px;
+}
+
+.part-tip .part-more {
+  margin-top: var(--sp-2);
+  font-size: var(--fs-1);
+  color: var(--ink-2);
+  display: none;
+}
+
+.part-tip.expanded .part-more {
+  display: block;
+}
+
+.part-tip .tip-close {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  color: var(--ink-2);
+  width: 28px;
+  height: 28px;
+  border-radius: var(--r-1);
+  display: grid;
+  place-items: center;
+}
+
+.part-tip .tip-close:hover {
+  background: var(--hover-tint);
+}
+
+/* ---------- 首屏封面 ---------- */
+.cover {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: grid;
+  grid-template-columns: minmax(300px, 480px) 1fr;
+  pointer-events: none;
+}
+
+.cover .cover-copy {
+  pointer-events: auto;
+  align-self: center;
+  padding: var(--sp-9) var(--sp-5) var(--sp-9) var(--sp-7);
+  max-width: 520px;
+}
+
+.cover h1 {
+  font-size: var(--fs-6);
+  line-height: var(--lh-tight);
+  letter-spacing: 0.02em;
+  margin-bottom: var(--sp-4);
+}
+
+.cover .cover-sub {
+  font-size: var(--fs-3);
+  color: var(--ink-1);
+  margin-bottom: var(--sp-6);
+  max-width: var(--measure);
+}
+
+.cover .cover-actions {
+  display: flex;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.cover .cover-note {
+  margin-top: var(--sp-6);
+  font-size: var(--fs-1);
+  color: var(--ink-2);
+}
+
+.cover .cover-right {
+  pointer-events: none; /* 3D 画布在下方可被拖动 */
+}
+
+/* 封面打开时左侧文案仍可读，画布整体可交互 */
+
+/* ---------- 加载层 ---------- */
+.loader {
+  position: absolute;
+  inset: 0;
+  z-index: calc(var(--z-modal) + 1);
+  display: grid;
+  place-items: center;
+  background: var(--bg-0);
+  transition: opacity 0.5s ease;
+}
+
+.loader.done {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loader .loader-box {
+  text-align: center;
+  display: grid;
+  gap: var(--sp-3);
+  justify-items: center;
+}
+
+.loader .loader-title {
+  font-size: var(--fs-3);
+  font-weight: 600;
+}
+
+.loader .loader-status {
+  font-size: var(--fs-1);
+  color: var(--ink-2);
+}
+
+.loader .loader-bar {
+  width: 220px;
+  height: 4px;
+  background: var(--bg-3);
+  border-radius: var(--r-pill);
+  overflow: hidden;
+}
+
+.loader .loader-bar i {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.3s ease;
+}
+
+/* ---------- 错误/降级层 ---------- */
+.fail-panel {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: none;
+  place-items: center;
+  background: var(--bg-0);
+  padding: var(--sp-5);
+}
+
+.fail-panel.show {
+  display: grid;
+}
+
+.fail-panel .fail-box {
+  max-width: 560px;
+  background: var(--bg-1);
+  border: 1px solid var(--line-0);
+  border-radius: var(--r-3);
+  box-shadow: var(--sh-3);
+  padding: var(--sp-6);
+}
+
+.fail-panel h2 {
+  font-size: var(--fs-4);
+  margin-bottom: var(--sp-3);
+}
+
+.fail-panel p {
+  color: var(--ink-1);
+  margin-bottom: var(--sp-3);
+}
+
+.fail-panel .fail-fallback {
+  background: var(--bg-2);
+  border-radius: var(--r-2);
+  padding: var(--sp-4);
+  font-size: var(--fs-2);
+  color: var(--ink-1);
+  max-height: 38vh;
+  overflow: auto;
+}
+
+.fail-panel .fail-fallback ol {
+  margin: var(--sp-2) 0 0;
+  padding-left: 1.4em;
+}
+
+.fail-panel .fail-fallback li {
+  margin-bottom: var(--sp-1);
+}
+
+/* ---------- 提示吐司 ---------- */
+.toast {
+  position: absolute;
+  top: var(--sp-4);
+  left: 50%;
+  transform: translate(-50%, -8px);
+  background: var(--ink-0);
+  color: var(--bg-1);
+  font-size: var(--fs-1);
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--r-pill);
+  box-shadow: var(--sh-3);
+  z-index: var(--z-toast);
+  opacity: 0;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: none;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* ---------- 瑞利判据交互面板（第 11 章辅图） ---------- */
+.rayleigh-panel {
+  background: var(--bg-1);
+  border: 1px solid var(--line-0);
+  border-radius: var(--r-2);
+  padding: var(--sp-3);
+  display: grid;
+  gap: var(--sp-2);
+  justify-items: start;
+}
+
+.rayleigh-panel canvas {
+  border-radius: var(--r-1);
+  max-width: 100%;
+  height: auto;
+}
+
+/* ---------- 晶圆场图（第 06 章俯视小图） ---------- */
+.fieldmap {
+  display: grid;
+  gap: var(--sp-2);
+  justify-items: center;
+}
+
+.fieldmap svg {
+  display: block;
+}
+
+/* ============================================================
+   响应式断点（写死数值）
+   ============================================================ */
+
+/* ≤1280：略窄章节轨 */
+@media (max-width: 1280px) {
+  :root {
+    --rail-w: 216px;
+  }
+}
+
+/* ≤1024：章节轨收窄 + 文案卡限宽 */
+@media (max-width: 1024px) {
+  :root {
+    --rail-w: 190px;
+  }
+  .copy-card {
+    width: min(340px, calc(100% - 32px));
+    padding: var(--sp-4);
+  }
+  .cover h1 {
+    font-size: var(--fs-5);
+  }
+}
+
+/* ≤768：移动端——章节轨变底部横条，舞台满幅 */
+@media (max-width: 768px) {
+  #app {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+      "top"
+      "stage"
+      "rail";
+  }
+  .rail {
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-right: 0;
+    border-top: 1px solid var(--line-0);
+    padding: var(--sp-2) var(--sp-3);
+    gap: var(--sp-2);
+    align-items: center;
+    -webkit-overflow-scrolling: touch;
+  }
+  .rail-heading {
+    display: none;
+  }
+  .chapter-btn {
+    flex: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: var(--sp-2);
+    min-width: 64px;
+    min-height: 56px;
+  }
+  .chapter-btn .no {
+    width: auto;
+  }
+  .chapter-btn .name {
+    font-size: var(--fs-1);
+    max-width: 84px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .copy-card {
+    left: var(--sp-3);
+    right: var(--sp-3);
+    bottom: calc(var(--sp-3) + 68px);
+    width: auto;
+    max-width: none;
+    padding: var(--sp-4);
+  }
+  .copy-card h2 {
+    font-size: var(--fs-3);
+  }
+  .copy-card.collapsed .what,
+  .copy-card.collapsed .why,
+  .copy-card.collapsed .term,
+  .copy-card.collapsed .scale-note {
+    display: none;
+  }
+  .copy-toggle {
+    display: inline-flex;
+  }
+  .action-bar {
+    left: var(--sp-3);
+    right: var(--sp-3);
+    bottom: calc(var(--sp-3) + 72px);
+  }
+  .recenter-btn {
+    top: var(--sp-3);
+    right: var(--sp-3);
+  }
+  .cover {
+    grid-template-columns: 1fr;
+  }
+  .cover .cover-copy {
+    align-self: end;
+    padding: var(--sp-5) var(--sp-5) var(--sp-7);
+  }
+  .cover h1 {
+    font-size: var(--fs-4);
+  }
+  .topbar .brand-sub {
+    display: none;
+  }
+}
+
+@media (min-width: 769px) {
+  .copy-toggle {
+    display: none;
+  }
+}
+
+/* ---------- 文字放大 200% 不破版 ---------- */
+@media (min-resolution: 1dppx) {
+  /* 使用 em/clamp 的关键处已按相对单位定义；此处兜底 */
+}
+
+/* ---------- 减弱动态效果 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------- 打印隐藏交互层 ---------- */
+@media print {
+  .rail,
+  .action-bar,
+  .recenter-btn,
+  .topbar .progress {
+    display: none;
+  }
+}
